@@ -20,19 +20,29 @@ public class MessageOutboundChannelAdapterParser extends
 	protected AbstractBeanDefinition parseConsumer(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.integration.bayeux.outbound.MessageSendingMessageHandler");
 
-		//IntegrationNamespaceUtils.configureHeaderMapper(element, builder, parserContext, DefaultXmppHeaderMapper.class, null);
+		//IntegrationNamespaceUtils.configureHeaderMapper(element, builder, parserContext, DefaultBayeuxHeaderMapper.class, null);
 
-		String connectionName = element.getAttribute("xmpp-connection");
-		if (StringUtils.hasText(connectionName)){
-			builder.addConstructorArgReference(connectionName);
+		String bayeuxClient = element.getAttribute("bayeux-client");
+
+		if (StringUtils.hasText(bayeuxClient)){
+			builder.addConstructorArgReference(bayeuxClient);
 		}
 		else if (parserContext.getRegistry().containsBeanDefinition(BayeuxNamespaceHandler.BAYEUX_CLIENT_BEAN_NAME)) {
 			builder.addConstructorArgReference(BayeuxNamespaceHandler.BAYEUX_CLIENT_BEAN_NAME);
 		}
 		else {
-			throw new BeanCreationException("You must either explicitly define which XMPP connection to use via " +
-					"'xmpp-connection' attribute or have default XMPP connection bean registered under the name 'xmppConnection'" +
-					"(e.g., <int-xmpp:xmpp-connection .../>). If 'id' is not provided the default will be 'xmppConnection'.");
+			throw new BeanCreationException("You must either explicitly define which Bayeux Cliente to use via " +
+					"'bayeux-client' attribute or have default Bayeux Client bean registered under the name 'bayeuxClient'" +
+					"(e.g., <int-bayeux:bayeux-client .../>). If 'id' is not provided the default will be 'bayeuxClient'.");
+		}
+		
+		String bayeuxChannelName = element.getAttribute("bayeux-channel");
+		if (StringUtils.hasText(bayeuxChannelName)) {
+			builder.addConstructorArgValue(bayeuxChannelName);
+		} else {
+			throw new BeanCreationException(
+					"You must explicitly define which channel the BayeuxClient will be listening to via the "
+							+ "'bayeux-channel' attribute.");
 		}
 
 		return builder.getBeanDefinition();

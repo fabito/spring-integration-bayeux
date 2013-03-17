@@ -30,7 +30,7 @@ public class MessageInboundChannelAdapterParser extends
 	protected AbstractBeanDefinition doParse(Element element, ParserContext parserContext, String channelName) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.integration.bayeux.inbound.MessageListeningEndpoint");
 
-		//TODO IntegrationNamespaceUtils.configureHeaderMapper(element, builder, parserContext, DefaultXmppHeaderMapper.class, null);
+		//TODO IntegrationNamespaceUtils.configureHeaderMapper(element, builder, parserContext, DefaultBayeuxHeaderMapper.class, null);
 
 		String bayeuxClient = element.getAttribute("bayeux-client");
 
