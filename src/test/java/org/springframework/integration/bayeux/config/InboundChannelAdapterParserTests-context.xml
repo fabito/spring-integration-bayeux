@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/bayeux http://www.springframework.org/schema/integration/bayeux/spring-integration-bayeux.xsd"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-bayeux="http://www.springframework.org/schema/integration/bayeux">
+
+    <bean id="testBayeuxClient" class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg value="org.cometd.client.BayeuxClient"/>
+	</bean>
+
+	<int-bayeux:inbound-channel-adapter channel="outChannel" 
+					bayeux-client="testBayeuxClient" auto-startup="false"/>
+
+	<int:channel id="outChannel"/>
+
+</beans>

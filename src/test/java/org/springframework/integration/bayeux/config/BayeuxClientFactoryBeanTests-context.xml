@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream
+		http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:stream="http://www.springframework.org/schema/integration/stream">
+
+	<bean id="bayeuxClient"
+		class="org.springframework.integration.bayeux.config.BayeuxClientFactoryBean">
+		<constructor-arg value="http://localhost:8000/faye" />
+		<constructor-arg ref="clientTransport" />
+	</bean>
+
+	<bean id="httpClient" class="org.eclipse.jetty.client.HttpClient"
+		init-method="start">
+	</bean>
+
+	<util:map id="clientTransportOptions">
+		<entry key="timeout" value="120000" />
+	</util:map>
+
+	<bean id="clientTransport" class="org.cometd.client.transport.LongPollingTransport">
+		<constructor-arg ref="clientTransportOptions" />
+		<constructor-arg ref="httpClient" />
+	</bean>
+
+	<int:channel id="exampleChannel" />
+
+	<bean id="inbound"
+		class="org.springframework.integration.bayeux.inbound.MessageListeningEndpoint">
+		<constructor-arg index="0" ref="bayeuxClient" />
+		<property name="outputChannel" ref="exampleChannel" />
+	</bean>
+
+	<stream:stdout-channel-adapter channel="exampleChannel" />
+
+</beans>

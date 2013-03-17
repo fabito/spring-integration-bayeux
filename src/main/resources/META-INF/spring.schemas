@@ -1,0 +1,2 @@
+http\://www.springframework.org/schema/integration/bayeux/spring-integration-bayeux-2.2.xsd=org/springframework/integration/bayeux/config/spring-integration-bayeux-2.2.xsd
+http\://www.springframework.org/schema/integration/bayeux/spring-integration-bayeux.xsd=org/springframework/integration/bayeux/config/spring-integration-bayeux-2.2.xsd
