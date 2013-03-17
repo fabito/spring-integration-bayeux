@@ -11,9 +11,25 @@
 		<constructor-arg value="org.cometd.client.BayeuxClient"/>
 	</bean>
 
-	<int-bayeux:inbound-channel-adapter channel="outChannel" 
-					bayeux-client="testBayeuxClient" auto-startup="false"/>
+	<int:channel id="bayeuxInbound">
+		<int:queue />
+	</int:channel>
 
-	<int:channel id="outChannel"/>
+	<int-bayeux:inbound-channel-adapter 
+					id="bayeuxInboundAdapter"
+	                channel="bayeuxInbound" 
+					bayeux-client="testBayeuxClient"
+					bayeux-channel="/chat" 
+					error-channel="errorChannel"
+					auto-startup="false"/>
+
+	<int-bayeux:inbound-channel-adapter 
+					id="autoChannel"
+	                error-channel="errorChannel"
+					bayeux-client="testBayeuxClient"
+					bayeux-channel="/chat" 
+					auto-startup="false"/>
+
+	<int:bridge input-channel="autoChannel" output-channel="nullChannel" />
 
 </beans>

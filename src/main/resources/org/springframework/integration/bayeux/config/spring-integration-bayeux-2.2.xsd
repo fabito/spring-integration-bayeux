@@ -71,7 +71,7 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:extension base="xmppInboundAdapterType">
+				<xsd:extension base="bayeuxInboundAdapterType">
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -80,17 +80,17 @@
 	<xsd:element name="outbound-channel-adapter">
 		<xsd:annotation>
 			<xsd:documentation>
-				Outbound Channel Adapter that sends chat messages.
+				Outbound Channel Adapter that sends messages.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:extension base="xmppOutboundAdapterType" />
+				<xsd:extension base="bayeuxOutboundAdapterType" />
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:complexType name="xmppInboundAdapterType">
+	<xsd:complexType name="bayeuxInboundAdapterType">
 		<xsd:attribute name="id" type="xsd:string" />
 		<xsd:attribute name="auto-startup" type="xsd:string"
 			default="true">
@@ -126,6 +126,13 @@
 					]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="bayeux-channel" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+						Identifies the channel name (topic) whose messages the bayeux-client will be listening to
+					]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="bayeux-client" type="xsd:string">
 			<xsd:annotation>
 				<xsd:appinfo>
@@ -134,7 +141,7 @@
 					</tool:annotation>
 				</xsd:appinfo>
 				<xsd:documentation>
-					Reference to XMPP connection bean
+					Reference to Bayeux Client bean
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -156,7 +163,7 @@
 		</xsd:attribute>
 	</xsd:complexType>
 
-	<xsd:complexType name="xmppOutboundAdapterType">
+	<xsd:complexType name="bayeuxOutboundAdapterType">
 		<xsd:choice minOccurs="0" maxOccurs="2">
 			<xsd:element ref="integration:poller" minOccurs="0"
 				maxOccurs="1" />

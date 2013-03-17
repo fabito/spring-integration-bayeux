@@ -32,10 +32,10 @@ public class MessageInboundChannelAdapterParser extends
 
 		//TODO IntegrationNamespaceUtils.configureHeaderMapper(element, builder, parserContext, DefaultXmppHeaderMapper.class, null);
 
-		String connectionName = element.getAttribute("bayeux-client");
+		String bayeuxClient = element.getAttribute("bayeux-client");
 
-		if (StringUtils.hasText(connectionName)){
-			builder.addConstructorArgReference(connectionName);
+		if (StringUtils.hasText(bayeuxClient)){
+			builder.addConstructorArgReference(bayeuxClient);
 		}
 		else if (parserContext.getRegistry().containsBeanDefinition(BayeuxNamespaceHandler.BAYEUX_CLIENT_BEAN_NAME)) {
 			builder.addConstructorArgReference(BayeuxNamespaceHandler.BAYEUX_CLIENT_BEAN_NAME);
@@ -45,9 +45,20 @@ public class MessageInboundChannelAdapterParser extends
 					"'bayeux-client' attribute or have default Bayeux Client bean registered under the name 'bayeuxClient'" +
 					"(e.g., <int-bayeux:bayeux-client .../>). If 'id' is not provided the default will be 'bayeuxClient'.");
 		}
+		
+		String bayeuxChannelName = element.getAttribute("bayeux-channel");
+		if (StringUtils.hasText(bayeuxChannelName)) {
+			builder.addConstructorArgValue(bayeuxChannelName);
+		} else {
+			throw new BeanCreationException(
+					"You must explicitly define which channel the BayeuxClient will be listening to via the "
+							+ "'bayeux-channel' attribute.");
+		}
+
 		builder.addPropertyReference("outputChannel", channelName);
 		IntegrationNamespaceUtils.setValueIfAttributeDefined(builder, element, "auto-startup");
 		IntegrationNamespaceUtils.setReferenceIfAttributeDefined(builder, element, "error-channel");
+		
 		this.postProcess(element, parserContext, builder);
 		return builder.getBeanDefinition();
 	}
