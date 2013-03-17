@@ -196,8 +196,15 @@
 					</tool:annotation>
 				</xsd:appinfo>
 				<xsd:documentation>
-					Reference to XMPP connection bean
+					Reference to Bayeux Client bean
 				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="bayeux-channel" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+						Identifies the channel name (topic) whose messages the bayeux-client will be listening to
+					]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="order">

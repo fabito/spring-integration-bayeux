@@ -18,7 +18,7 @@ public class MessageOutboundChannelAdapterParser extends
 
 	@Override
 	protected AbstractBeanDefinition parseConsumer(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.integration.bayeux.outbound.MessageSendingMessageHandler");
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.integration.bayeux.outbound.SendingMessageHandler");
 
 		//IntegrationNamespaceUtils.configureHeaderMapper(element, builder, parserContext, DefaultBayeuxHeaderMapper.class, null);
 
