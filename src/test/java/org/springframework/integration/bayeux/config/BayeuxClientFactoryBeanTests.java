@@ -25,16 +25,17 @@ public class BayeuxClientFactoryBeanTests {
 		assertNotNull(bayeuxClient);
 	}
 	
-	@Test
-	public void testBayeuxClientFactoryBeanViaConfig() throws Exception {
-		new ClassPathXmlApplicationContext("BayeuxClientFactoryBeanTests-context.xml", this.getClass());
-		// the fact that no exception was thrown satisfies this test
-	}
+//	@Test
+//	public void testBayeuxClientFactoryBeanViaConfig() throws Exception {
+//		new ClassPathXmlApplicationContext("BayeuxClientFactoryBeanTests-context.xml", this.getClass());
+//		// the fact that no exception was thrown satisfies this test
+//	}
 	
 	@Test
 	public void testBayeuxClientFactoryBeanViaConfig2() throws Exception {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("BayeuxClientFactoryBeanTests-context.xml", this.getClass());
 		BayeuxClient bayeuxClient = ctx.getBean(BayeuxClient.class);
+		bayeuxClient.disconnect();
 		bayeuxClient.waitFor(60 * 1000, BayeuxClient.State.DISCONNECTED);
 		//assertTrue(bayeuxClient.isConnected());
 	}

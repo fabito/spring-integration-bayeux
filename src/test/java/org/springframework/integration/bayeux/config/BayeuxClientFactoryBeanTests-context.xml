@@ -11,7 +11,7 @@
 
 	<bean id="bayeuxClient"
 		class="org.springframework.integration.bayeux.config.BayeuxClientFactoryBean">
-		<constructor-arg value="http://localhost:8000/faye" />
+		<constructor-arg value="http://localhost:8080" />
 		<constructor-arg ref="clientTransport" />
 	</bean>
 
@@ -33,9 +33,78 @@
 	<bean id="inbound"
 		class="org.springframework.integration.bayeux.inbound.MessageListeningEndpoint">
 		<constructor-arg index="0" ref="bayeuxClient" />
+		<constructor-arg index="1" value="/test" />
 		<property name="outputChannel" ref="exampleChannel" />
 	</bean>
 
 	<stream:stdout-channel-adapter channel="exampleChannel" />
+
+	<bean id="jettyServer" class="org.eclipse.jetty.server.Server"
+		init-method="start" destroy-method="stop">
+
+		<property name="threadPool">
+			<bean id="ThreadPool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+				<property name="minThreads" value="10" />
+				<property name="maxThreads" value="50" />
+			</bean>
+		</property>
+
+		<property name="connectors">
+			<list>
+				<bean id="Connector" class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+					<property name="port" value="8080" />
+				</bean>
+			</list>
+		</property>
+
+		<property name="handler">
+			<bean id="handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+				<property name="handlers">
+					<list>
+						<bean class="org.eclipse.jetty.servlet.ServletContextHandler">
+							<property name="contextPath" value="/" />
+							<property name="sessionHandler">
+								<bean class="org.eclipse.jetty.server.session.SessionHandler" />
+							</property>
+							<property name="resourceBase" value="." />
+							<property name="servletHandler">
+								<bean class="org.eclipse.jetty.servlet.ServletHandler">
+									<property name="servlets"> <!-- servlet definition -->
+										<list>
+											<!-- default servlet -->
+											<bean class="org.eclipse.jetty.servlet.ServletHolder">
+												<property name="name" value="cometd" />
+												<property name="servlet">
+													<bean class="org.cometd.server.CometdServlet" />
+												</property>
+												<property name="initParameters">
+													<map>
+														<entry key="timeout" value="60000" />
+													</map>
+												</property>
+											</bean>
+										</list>
+									</property>
+									<property name="servletMappings">
+										<list>
+											<bean class="org.eclipse.jetty.servlet.ServletMapping">
+												<property name="pathSpecs">
+													<list>
+														<value>/</value>
+													</list>
+												</property>
+												<property name="servletName" value="cometd" />
+											</bean>
+										</list>
+									</property>
+								</bean>
+							</property>
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+
+	</bean>
 
 </beans>
