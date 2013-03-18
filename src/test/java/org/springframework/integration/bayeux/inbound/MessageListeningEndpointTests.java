@@ -14,8 +14,11 @@ import org.cometd.bayeux.client.ClientSessionChannel;
 import org.cometd.bayeux.client.ClientSessionChannel.MessageListener;
 import org.cometd.client.BayeuxClient;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.integration.MessagingException;
@@ -27,8 +30,15 @@ import org.springframework.integration.core.PollableChannel;
 import org.springframework.integration.message.ErrorMessage;
 import org.springframework.integration.test.util.TestUtils;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MessageListeningEndpointTests {
 
+	@Mock 
+	private BayeuxClient bayeuxClient;
+	
+	@Mock 
+	private ClientSessionChannel clientSessionChannel;
+	
 	/**
 	 * Should add/remove MessageListener when endpoint started/stopped
 	 */
@@ -37,27 +47,25 @@ public class MessageListeningEndpointTests {
 		
 		final Set<MessageListener> packetListSet = new HashSet<MessageListener>();
 		
-		BayeuxClient bayeuxClient = mock(BayeuxClient.class);
-		ClientSessionChannel sessionChannel = mock(ClientSessionChannel.class);
 		String channelName = "/testChannel";
 		
 		MessageListeningEndpoint endpoint = new MessageListeningEndpoint(bayeuxClient, channelName);
 
-		when(bayeuxClient.getChannel(channelName)).thenReturn(sessionChannel);
+		when(bayeuxClient.getChannel(channelName)).thenReturn(clientSessionChannel);
 		
 		doAnswer(new Answer<Object>() {
 			public Object answer(InvocationOnMock invocation) throws Throwable {
 				packetListSet.add((MessageListener) invocation.getArguments()[0]);
 				return null;
 			}
-		}).when(sessionChannel).subscribe(Mockito.any(MessageListener.class));
+		}).when(clientSessionChannel).subscribe(Mockito.any(MessageListener.class));
 
 		doAnswer(new Answer<Object>() {
 			public Object answer(InvocationOnMock invocation) throws Throwable {
 				packetListSet.remove(invocation.getArguments()[0]);
 				return null;
 			}
-		}).when(sessionChannel).unsubscribe(Mockito.any(MessageListener.class));
+		}).when(clientSessionChannel).unsubscribe(Mockito.any(MessageListener.class));
 
 		assertEquals(0, packetListSet.size());
 		endpoint.setOutputChannel(new QueueChannel());
@@ -72,14 +80,14 @@ public class MessageListeningEndpointTests {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testNonInitializationFailure(){
-		MessageListeningEndpoint endpoint = new MessageListeningEndpoint(mock(BayeuxClient.class), "");
+		MessageListeningEndpoint endpoint = new MessageListeningEndpoint(bayeuxClient, "");
 		endpoint.start();
 	}
 	
 	@Test
 	public void testWithImplicitBayeuxClient(){
 		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
-		bf.registerSingleton(BayeuxContextUtils.BAYEUX_CLIENT_BEAN_NAME, mock(BayeuxClient.class));
+		bf.registerSingleton(BayeuxContextUtils.BAYEUX_CLIENT_BEAN_NAME, bayeuxClient);
 		MessageListeningEndpoint endpoint = new MessageListeningEndpoint();
 		endpoint.setBeanFactory(bf);
 		endpoint.setOutputChannel(new QueueChannel());
@@ -96,7 +104,6 @@ public class MessageListeningEndpointTests {
 	@Test
 	public void testWithErrorChannel(){
 		DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
-		BayeuxClient bayeuxClient = mock(BayeuxClient.class);
 		bf.registerSingleton(BayeuxContextUtils.BAYEUX_CLIENT_BEAN_NAME, bayeuxClient);
 		
 		MessageListeningEndpoint endpoint = new MessageListeningEndpoint();
@@ -118,7 +125,7 @@ public class MessageListeningEndpointTests {
 		
 		Message message = mock(Message.class);
 		when(message.toString()).thenReturn("hello");
-		listener.onMessage(mock(ClientSessionChannel.class), message);
+		listener.onMessage(clientSessionChannel, message);
 
 		ErrorMessage msg =  
 			(ErrorMessage) errorChannel.receive();
